@@ -40,6 +40,8 @@
 			loadAudio('samples/Ensoniq-C4.wav', function(c4) {
 				loadAudio('samples/Ensoniq-C7.wav', function(c7) {
 
+					$('h2').remove();
+
 					c2.pitch = new Pitch('C2');
 					c4.pitch = new Pitch('C4');
 					c7.pitch = new Pitch('C7');

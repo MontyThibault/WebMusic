@@ -3,7 +3,7 @@ This is an experiment with the new [Web Audio API](http://www.html5rocks.com/en/
 
 The code and presentation for this project is messy, but it shows what Web Audio API is capable of. If you like it, please show motivation to keep the project moving foreward!
 
-###[Demonstration Page](http://montythibault.github.com/music)
+###[Demonstration Page](http://montythibault.github.com/WebMusic/index.html)
 __You will need a modern version of Chrome or Safari for this page to work!__
 
 ## Engine
