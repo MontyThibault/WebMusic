@@ -1,0 +1,38 @@
+<!doctype html>
+<html>
+	<head>
+		<title>Music App</title>
+		<style>
+			.duration {
+				display: inline-block;
+				width: 30px;
+				text-align: center;
+				color: red;
+			}
+
+			.note {
+				display: inline-block;
+				width: 30px;
+				text-align: center;
+				color: blue;
+			}
+
+			#notes > div {
+				background: #EEEEEE;
+				border: 1px solid #DDDDDD;
+				padding: 3px;
+				margin: 3px;
+				float: left;
+			}
+		</style>
+	</head>
+	<body>	
+		<p>The music on this page is being generated dynamically with JavaScript! A modern version of Chrome or Safari is required. See <a href=''>this page</a> for details.</p>
+		<div id='notes'>
+
+		</div>
+
+		<script src='//cdnjs.cloudflare.com/ajax/libs/jquery/1.8.0/jquery-1.8.0.min.js'></script>
+		<script src='music.js'></script>
+	</body>
+</html>
