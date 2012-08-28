@@ -61,7 +61,7 @@ load.all = function(items, callback, outputs) {
 
 		// If all items are done
 		} else {
-			callback.apply(this, outputs);
+			callback.call(this, outputs);
 		}
 	});
 };

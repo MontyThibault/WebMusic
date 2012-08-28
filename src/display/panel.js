@@ -1,16 +1,40 @@
 function Panel(element) {
 
-	if(element.length > 1) {
+	// Create an empty group if no element is passed in
+	if(!element) {
+		var g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+		this.svg = $(g);
+
+	// If a set of elements are passed in, add them to a group
+	} else if(element.length > 1) {
 		var g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
 		this.svg = $(g).append(element);
 
+	// Add the element just as it is
 	} else {
 		this.svg = $(element);
 	}
 }
 
-Panel.prototype.globalBox = function() {
-	return this.svg[0].getBBox();
+Panel.prototype.clone = function() {
+	return new Panel(this.svg.clone());
+};
+
+Panel.prototype.box = function() {
+
+	// If this element is in the document markup
+	if($(svg).find(this.svg).length) {
+		return this.svg[0].getBBox();
+	}
+
+	// Must be added to the markup for getBBox() to work
+	$(svg).append(this.svg);
+
+	var box =  this.svg[0].getBBox();
+	
+	this.svg.remove();
+
+	return box;
 };
 
 Panel.prototype.center = function() {
@@ -30,7 +54,7 @@ Panel.prototype.wrap = function() {
 };
 
 // Sets a new translation for this panel
-Panel.prototype.translate = function(pt) {
+Panel.prototype.translate = function(x, y) {
 
 	var transform = this.svg.attr('transform') || '';
 
@@ -38,7 +62,7 @@ Panel.prototype.translate = function(pt) {
 	transform = transform.replace(/translate\(.*\)/g, '');
 
 	// Add a new translation
-	transform += ' translate('+pt.x+', '+pt.y+')';
+	transform += ' translate('+ x +', '+ y +')';
 
 	this.svg.attr('transform', transform);
 };

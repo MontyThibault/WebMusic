@@ -76,7 +76,7 @@ load.all = function(items, callback, outputs) {
 
 		// If all items are done
 		} else {
-			callback.apply(this, outputs);
+			callback.call(this, outputs);
 		}
 	});
 };
@@ -255,17 +255,41 @@ function globalSpace(pt, object) {
 
 function Panel(element) {
 
-	if(element.length > 1) {
+	// Create an empty group if no element is passed in
+	if(!element) {
+		var g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+		this.svg = $(g);
+
+	// If a set of elements are passed in, add them to a group
+	} else if(element.length > 1) {
 		var g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
 		this.svg = $(g).append(element);
 
+	// Add the element just as it is
 	} else {
 		this.svg = $(element);
 	}
 }
 
-Panel.prototype.globalBox = function() {
-	return this.svg[0].getBBox();
+Panel.prototype.clone = function() {
+	return new Panel(this.svg.clone());
+};
+
+Panel.prototype.box = function() {
+
+	// If this element is in the document markup
+	if($(svg).find(this.svg).length) {
+		return this.svg[0].getBBox();
+	}
+
+	// Must be added to the markup for getBBox() to work
+	$(svg).append(this.svg);
+
+	var box =  this.svg[0].getBBox();
+	
+	this.svg.remove();
+
+	return box;
 };
 
 Panel.prototype.center = function() {
@@ -285,7 +309,7 @@ Panel.prototype.wrap = function() {
 };
 
 // Sets a new translation for this panel
-Panel.prototype.translate = function(pt) {
+Panel.prototype.translate = function(x, y) {
 
 	var transform = this.svg.attr('transform') || '';
 
@@ -293,7 +317,7 @@ Panel.prototype.translate = function(pt) {
 	transform = transform.replace(/translate\(.*\)/g, '');
 
 	// Add a new translation
-	transform += ' translate('+pt.x+', '+pt.y+')';
+	transform += ' translate('+ x +', '+ y +')';
 
 	this.svg.attr('transform', transform);
 };
@@ -421,17 +445,30 @@ window.log = function() {
 
 window.onload = function() {
 	var items = [
-		[load.sample, 'assets/samples/Ensoniq-C2.wav'],
-		[load.sample, 'assets/samples/Ensoniq-C4.wav'],
-		[load.sample, 'assets/samples/Ensoniq-C7.wav'],
-		[load.SVG, 'assets/svg/keyboard.svg'],
+		[load.all, [
+			[load.sample, 'assets/samples/Ensoniq-C2.wav'],
+			[load.sample, 'assets/samples/Ensoniq-C4.wav'],
+			[load.sample, 'assets/samples/Ensoniq-C7.wav']
+		]],
+		
+		[load.all, [
+			[load.SVG, 'assets/svg/whiteKey.svg'],
+			[load.SVG, 'assets/svg/blackKey.svg']
+		]],
+		
 		[load.JSON, 'music.json']
 	];
 
-	load.all(items, function() {
-		var c2 = arguments[0],
-			c4 = arguments[1],
-			c7 = arguments[2];
+	load.all(items, function(loaded) {
+		var samples = loaded[0],
+			images = loaded[1],
+			music = loaded[2];
+
+		/////////////////////////////////////
+
+		var c2 = samples[0],
+			c4 = samples[1],
+			c7 = samples[2];
 
 		c2.pitch = new Pitch('C2');
 		c4.pitch = new Pitch('C4');
@@ -441,8 +478,93 @@ window.onload = function() {
 
 		///////////////////////////////////////
 
-		window.keyboard = arguments[3];
-		$(svg).append(keyboard.svg[0]);
+		var white = images[0],
+			black = images[1];
+
+		// Center along x axes
+		white.translate(-white.box().width / 2, 0);
+		black.translate(-black.box().width / 2, 0);
+
+		var keyboard = new Panel(),
+			keyWidth = white.box().width * 1.05;
+
+		var currentKey = null,
+			currentOctave = null;
+
+		for(var octave = 0; octave < 4; octave++) {
+
+			currentOctave = new Panel();
+			currentOctave.translate(octave * (keyWidth * 7), 0);
+
+			// Bottom row of keys
+			for(var bottom = 0; bottom < 7; bottom++) {
+
+				currentKey = white.clone();
+				
+				currentKey.translate(keyWidth * bottom, 0);
+				currentKey.svg.on('mouseenter', function() {
+
+					// The main white area of the key
+					var path = $(this).find('path').first();
+					var style = path.attr('style');
+					style = style.replace(/fill:[^;]+/g, 'fill:#bde8ff;')
+					path.attr('style', style);
+
+					// $(this).attr('style', 'fill:rgb(255, 0, 0);');
+				});
+				currentKey.svg.on('mouseleave', function() {
+					var path = $(this).find('path').first();
+					var style = path.attr('style');
+					style = style.replace(/fill:[^;]+/g, 'fill:#ffffff;')
+					path.attr('style', style);
+				});
+
+
+				currentOctave.svg.append(currentKey.svg);
+
+			}
+
+			// Top row of keys
+			for(var top = 0; top < 7; top++) {
+				if(top === 2 || top === 6) {
+					continue;
+				}
+
+				currentKey = black.clone();
+
+				currentKey.translate(keyWidth * (top + 0.6), 0);
+				currentKey.svg.on('mouseenter', function() {
+
+					// The main white area of the key
+					var path = $(this).find('path').first();
+					var style = path.attr('style');
+					style = style.replace(/fill:[^;]+/g, 'fill:#bde8ff;')
+					path.attr('style', style);
+
+					// $(this).attr('style', 'fill:rgb(255, 0, 0);');
+				});
+				currentKey.svg.on('mouseleave', function() {
+					var path = $(this).find('path').first();
+					var style = path.attr('style');
+					style = style.replace(/fill:[^;]+/g, 'fill:#171717;')
+					path.attr('style', style);
+				});
+
+				currentOctave.svg.append(currentKey.svg);
+
+			}
+
+			keyboard.svg.append(currentOctave.svg);
+		}
+
+		keyboard.scale(5, 5);
+
+		$(svg).append(keyboard.svg);
+
+		window.keyboard = keyboard;
+
+		// white = arguments[3];
+		//$(svg).append(white.svg[0]);
 
 		// var pitch = new Pitch('C5'),
 		// 	note = new Note(pitch, 1000, [
