@@ -1,0 +1,24 @@
+{
+	"meta": {
+		"title": "The best song ever",
+		"composer": "Bach"
+	},
+
+	"channels": [
+		{ 
+			"name": "Piano", 
+			"sample": "piano", 
+			"events": [
+				{ "type": "tempo", "tempo": 120 },
+				{ "type": "time", "top": 3, "bottom": 4 },
+
+				{ "type": "note", "duration": 4, "pitch": "C4" },
+				{ "type": "rest", "duration": 4 },
+				{ "type": "note", "duration": 4, "pitch": "F#5" },
+
+				{ "type": "note", "duration": 2, "pitch": "C5" },
+				{ "type": "rest", "duration": 4 }
+			]
+		}
+	]
+}
