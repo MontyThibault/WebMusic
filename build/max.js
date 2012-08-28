@@ -22,11 +22,29 @@ load.XML = function(url, callback) {
 
 	request.onload = function() {
 		var xml = parser.parseFromString(request.response, 'text/xml');
-		callback(xml);
+		callback(xml.documentElement);
 	};
 
 	request.send();
 };
+
+load.SVG = function(url, callback) {
+	// This will match the ending filename PLUS the proceeding period
+	var filename = url.match(/([^\/]+)\./g)[0];
+
+	// Trim off the period
+	filename = filename.substring(0, filename.length - 1);
+
+	load.XML(url, function(x) {
+
+		var contents = $(x).contents();
+		var panel = new Panel(contents);
+
+		panel.svg.attr('id', filename);
+
+		return callback(panel);
+	});
+}
 
 load.sample = function(url, callback) {
 	var request = new XMLHttpRequest();
@@ -61,187 +79,6 @@ load.all = function(items, callback, outputs) {
 			callback.apply(this, outputs);
 		}
 	});
-};
-
-
-///////////////////////////////////////
-//File: src/misc/vector2.js
-
-
-/**
- * @author mrdoob / http://mrdoob.com/
- * @author philogb / http://blog.thejit.org/
- * @author egraether / http://egraether.com/
- * @author zz85 / http://www.lab4games.net/zz85/blog
- */
-
-var Vector2 = function ( x, y ) {
-
-	this.x = x || 0;
-	this.y = y || 0;
-
-};
-
-Vector2.prototype = {
-
-	constructor: Vector2,
-
-	set: function ( x, y ) {
-
-		this.x = x;
-		this.y = y;
-
-		return this;
-
-	},
-
-	copy: function ( v ) {
-
-		this.x = v.x;
-		this.y = v.y;
-
-		return this;
-
-	},
-
-	add: function ( a, b ) {
-
-		this.x = a.x + b.x;
-		this.y = a.y + b.y;
-
-		return this;
-
-	},
-
-	addSelf: function ( v ) {
-
-		this.x += v.x;
-		this.y += v.y;
-
-		return this;
-
-	},
-
-	sub: function ( a, b ) {
-
-		this.x = a.x - b.x;
-		this.y = a.y - b.y;
-
-		return this;
-
-	},
-
-	subSelf: function ( v ) {
-
-		this.x -= v.x;
-		this.y -= v.y;
-
-		return this;
-
-	},
-
-	multiplyScalar: function ( s ) {
-
-		this.x *= s;
-		this.y *= s;
-
-		return this;
-
-	},
-
-	divideScalar: function ( s ) {
-
-		if ( s ) {
-
-			this.x /= s;
-			this.y /= s;
-
-		} else {
-
-			this.set( 0, 0 );
-
-		}
-
-		return this;
-
-	},
-
-	negate: function() {
-
-		return this.multiplyScalar( - 1 );
-
-	},
-
-	dot: function ( v ) {
-
-		return this.x * v.x + this.y * v.y;
-
-	},
-
-	lengthSq: function () {
-
-		return this.x * this.x + this.y * this.y;
-
-	},
-
-	length: function () {
-
-		return Math.sqrt( this.lengthSq() );
-
-	},
-
-	normalize: function () {
-
-		return this.divideScalar( this.length() );
-
-	},
-
-	distanceTo: function ( v ) {
-
-		return Math.sqrt( this.distanceToSquared( v ) );
-
-	},
-
-	distanceToSquared: function ( v ) {
-
-		var dx = this.x - v.x, dy = this.y - v.y;
-		return dx * dx + dy * dy;
-
-	},
-
-	setLength: function ( l ) {
-
-		return this.normalize().multiplyScalar( l );
-
-	},
-
-	lerpSelf: function ( v, alpha ) {
-
-		this.x += ( v.x - this.x ) * alpha;
-		this.y += ( v.y - this.y ) * alpha;
-
-		return this;
-
-	},
-
-	equals: function( v ) {
-
-		return ( ( v.x === this.x ) && ( v.y === this.y ) );
-
-	},
-
-	isZero: function () {
-
-		return ( this.lengthSq() < 0.0001 /* almostZero */ );
-
-	},
-
-	clone: function () {
-
-		return new Vector2( this.x, this.y );
-
-	}
-
 };
 
 
@@ -382,6 +219,113 @@ Instrument.prototype.play = function(note) {
 
 
 ///////////////////////////////////////
+//File: src/display/svg.js
+
+
+var svg = $('svg')[0];
+
+
+///////////////////////////////////////
+//File: src/display/point.js
+
+
+// http://stackoverflow.com/questions/4850821/svg-coordinates-with-transform-matrix
+function createPoint(x, y) {
+	var pt = svg.createSVGPoint();
+	pt.x = x || 0;
+	pt.y = y || 0;
+
+	return pt.matrixTransform(svg.getScreenCTM().inverse());
+}
+
+function localSpace(pt, object) {
+	var globalToLocal = object.getTransformToElement(svg).inverse();
+	return pt.matrixTransform(globalToLocal);
+}
+
+function globalSpace(pt, object) {
+	var localToGlobal = object.getTransformToElement(svg);
+	return pt.matrixTransform(localToGlobal);
+}
+
+
+///////////////////////////////////////
+//File: src/display/panel.js
+
+
+function Panel(element) {
+
+	if(element.length > 1) {
+		var g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+		this.svg = $(g).append(element);
+
+	} else {
+		this.svg = $(element);
+	}
+}
+
+Panel.prototype.globalBox = function() {
+	return this.svg[0].getBBox();
+};
+
+Panel.prototype.center = function() {
+	var box = this.svg[0].getBBox(),
+		pt = svg.createSVGPoint();
+	pt.x = box.x + (box.width / 2);
+	pt.y = box.y + (box.height / 2);
+
+	return pt;
+};
+
+// // Wraps this panel in a group tag
+Panel.prototype.wrap = function() {
+	var g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+	this.svg.wrap(g);
+	this.svg = this.svg.parent();
+};
+
+// Sets a new translation for this panel
+Panel.prototype.translate = function(pt) {
+
+	var transform = this.svg.attr('transform') || '';
+
+	// Remove the current translation, if any
+	transform = transform.replace(/translate\(.*\)/g, '');
+
+	// Add a new translation
+	transform += ' translate('+pt.x+', '+pt.y+')';
+
+	this.svg.attr('transform', transform);
+};
+
+Panel.prototype.scale = function(x, y) {
+
+	var transform = this.svg.attr('transform') || '';
+
+	// Remove the current scale, if any
+	transform = transform.replace(/scale\(.*\)/g, '');
+
+	// Add a new scale
+	transform += ' scale('+x+', '+(x || y)+')';
+
+	this.svg.attr('transform', transform);
+};
+
+Panel.prototype.rotate = function(r) {
+
+	var transform = this.svg.attr('transform') || '';
+
+	// Remove the current rotation, if any
+	transform = transform.replace(/rotate\(.*\)/g, '');
+
+	// Add a new rotation
+	transform += ' rotate('+r+')';
+
+	this.svg.attr('transform', transform);
+}
+
+
+///////////////////////////////////////
 //File: src/modifiers/dynamic.js
 
 
@@ -480,21 +424,32 @@ window.onload = function() {
 		[load.sample, 'assets/samples/Ensoniq-C2.wav'],
 		[load.sample, 'assets/samples/Ensoniq-C4.wav'],
 		[load.sample, 'assets/samples/Ensoniq-C7.wav'],
+		[load.SVG, 'assets/svg/keyboard.svg'],
 		[load.JSON, 'music.json']
 	];
 
-	load.all(items, function(c2, c4, c7, music) {
+	load.all(items, function() {
+		var c2 = arguments[0],
+			c4 = arguments[1],
+			c7 = arguments[2];
+
 		c2.pitch = new Pitch('C2');
 		c4.pitch = new Pitch('C4');
 		c7.pitch = new Pitch('C7');
+
 		var piano = new Instrument([c2, c4, c7]);
 
-		var pitch = new Pitch('C5'),
-			note = new Note(pitch, 1000, [
-				Dynamic('mp'),
-				Staccato()
-			]);
+		///////////////////////////////////////
 
-		piano.play(note);
+		window.keyboard = arguments[3];
+		$(svg).append(keyboard.svg[0]);
+
+		// var pitch = new Pitch('C5'),
+		// 	note = new Note(pitch, 1000, [
+		// 		Dynamic('mp'),
+		// 		Staccato()
+		// 	]);
+
+		// piano.play(note);
 	});
 };

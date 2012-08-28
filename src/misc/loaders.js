@@ -7,11 +7,29 @@ load.XML = function(url, callback) {
 
 	request.onload = function() {
 		var xml = parser.parseFromString(request.response, 'text/xml');
-		callback(xml);
+		callback(xml.documentElement);
 	};
 
 	request.send();
 };
+
+load.SVG = function(url, callback) {
+	// This will match the ending filename PLUS the proceeding period
+	var filename = url.match(/([^\/]+)\./g)[0];
+
+	// Trim off the period
+	filename = filename.substring(0, filename.length - 1);
+
+	load.XML(url, function(x) {
+
+		var contents = $(x).contents();
+		var panel = new Panel(contents);
+
+		panel.svg.attr('id', filename);
+
+		return callback(panel);
+	});
+}
 
 load.sample = function(url, callback) {
 	var request = new XMLHttpRequest();

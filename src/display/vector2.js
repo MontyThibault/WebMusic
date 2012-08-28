@@ -1,8 +1,6 @@
 /**
- * @author mrdoob / http://mrdoob.com/
- * @author philogb / http://blog.thejit.org/
- * @author egraether / http://egraether.com/
- * @author zz85 / http://www.lab4games.net/zz85/blog
+ * From THREE.js source
+ * Modified for use in this project
  */
 
 var Vector2 = function ( x, y ) {
@@ -15,6 +13,19 @@ var Vector2 = function ( x, y ) {
 Vector2.prototype = {
 
 	constructor: Vector2,
+
+	toSVG: function() {
+		var pt = svg.createSVGPoint();
+		pt.x = this.x;
+		pt.y = this.y;
+		return pt;
+	},
+
+	fromSVG: function(pt) {
+		this.x = pt.x;
+		this.y = pt.y;
+		return this;
+	},
 
 	set: function ( x, y ) {
 
