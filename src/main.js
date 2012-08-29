@@ -19,8 +19,9 @@ window.onload = function() {
 	];
 
 	load.all(items, function(loaded) {
-		// Remove spinner
+		// Remove spinner & file indicator
 		spin.remove();
+		currentFile.remove();
 
 		var samples = loaded[0],
 			images = loaded[1],
@@ -116,8 +117,6 @@ window.onload = function() {
 
 	// Loading spinner
 	var options = {
-		top: window.innerHeight / 3,
-		left: window.innerWidth / 2,
 		lines: 13,
 		length: 8,
 		width: 4,
@@ -125,5 +124,9 @@ window.onload = function() {
 	};
 	var target = $('body')[0];
 	var spin = $(new Spinner(options).spin(target).el);
-	spin.css('position', 'absolute');
+	spin.removeAttr('style'); // EVIL!
+
+	var currentFile = $('<span></span>');
+	currentFile.attr('id', 'currentFile');
+	$(target).append(currentFile);
 };

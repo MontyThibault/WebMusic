@@ -12,8 +12,6 @@ Player.prototype.process = function(evt) {
 
 	evt = evt || this.events.shift();
 
-	console.log(evt);
-
 	// Done the sequence
 	if(!evt)
 		return false;

@@ -19,6 +19,7 @@ var context = new webkitAudioContext();
 var load = {};
 
 load.XML = function(url, callback) {
+
 	var parser = new DOMParser();
 	var request = new XMLHttpRequest();
 	request.open('GET', url, true);
@@ -32,6 +33,7 @@ load.XML = function(url, callback) {
 };
 
 load.SVG = function(url, callback) {
+
 	// This will match the ending filename of any given directory
 	var filename = /([^\/]+)\./g.exec(url)[1];
 
@@ -48,6 +50,7 @@ load.SVG = function(url, callback) {
 }
 
 load.sample = function(url, callback) {
+
 	var request = new XMLHttpRequest();
 	request.open('GET', url, true);
 	request.responseType = 'arraybuffer';
@@ -69,6 +72,10 @@ load.JSON = $.getJSON;
 load.all = function(items, callback, outputs) {
 	var next = items.shift();
 
+	if(typeof next[1] === 'string') {
+		load.updateScreen(next[1]);
+	}
+
 	// Load the next item
 	next[0](next[1], function(x) {
 
@@ -84,6 +91,11 @@ load.all = function(items, callback, outputs) {
 			callback.call(this, outputs);
 		}
 	});
+};
+
+// Updates the file name in the loading screen
+load.updateScreen = function(url) {
+	$('#currentFile').text(url);
 };
 
 
@@ -247,8 +259,6 @@ Player.prototype.process = function(evt) {
 		return false;
 
 	evt = evt || this.events.shift();
-
-	console.log(evt);
 
 	// Done the sequence
 	if(!evt)
@@ -718,8 +728,9 @@ window.onload = function() {
 	];
 
 	load.all(items, function(loaded) {
-		// Remove spinner
+		// Remove spinner & file indicator
 		spin.remove();
+		currentFile.remove();
 
 		var samples = loaded[0],
 			images = loaded[1],
@@ -815,8 +826,6 @@ window.onload = function() {
 
 	// Loading spinner
 	var options = {
-		top: window.innerHeight / 3,
-		left: window.innerWidth / 2,
 		lines: 13,
 		length: 8,
 		width: 4,
@@ -824,5 +833,9 @@ window.onload = function() {
 	};
 	var target = $('body')[0];
 	var spin = $(new Spinner(options).spin(target).el);
-	spin.css('position', 'absolute');
+	spin.removeAttr('style'); // EVIL!
+
+	var currentFile = $('<span></span>');
+	currentFile.attr('id', 'currentFile');
+	$(target).append(currentFile);
 };

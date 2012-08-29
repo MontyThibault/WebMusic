@@ -15,8 +15,8 @@
 				{ "type": "note", "duration": 4, "pitch": "C4" },
 				{ "type": "note", "duration": 4, "pitch": "D4" },
 				{ "type": "note", "duration": 4, "pitch": "E4" },
-				{ "type": "staccato", "value": true },
 				{ "type": "note", "duration": 4, "pitch": "F4" },
+				{ "type": "staccato", "value": true },
 				{ "type": "note", "duration": 4, "pitch": "G4" },
 				{ "type": "note", "duration": 4, "pitch": "A4" },
 				{ "type": "note", "duration": 4, "pitch": "B4" },
@@ -43,9 +43,6 @@
 				{ "type": "note", "duration": 16, "pitch": "E3", "dynamic": "f" },
 				{ "type": "note", "duration": 1, "pitch": "C3", "dynamic": "f" },
 				{ "type": "letRing", "value": "mf" },
-				{ "type": "letRing", "value": false },
-
-				{ "type": "letRing", "value": true },
 
 				{ "type": "rest", "duration": 2 },
 				{ "type": "note", "duration": 16, "pitch": "G#3" },
