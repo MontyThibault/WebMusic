@@ -10,14 +10,17 @@
 			"sample": "piano", 
 			"events": [
 				{ "type": "tempo", "tempo": 120 },
-				{ "type": "time", "top": 3, "bottom": 4 },
+				{ "type": "timesig", "timesig": [4, 4] },
 
 				{ "type": "note", "duration": 4, "pitch": "C4" },
-				{ "type": "rest", "duration": 4 },
-				{ "type": "note", "duration": 4, "pitch": "F#5" },
-
-				{ "type": "note", "duration": 2, "pitch": "C5" },
-				{ "type": "rest", "duration": 4 }
+				{ "type": "note", "duration": 4, "pitch": "D4" },
+				{ "type": "note", "duration": 4, "pitch": "E4" },
+				{ "type": "note", "duration": 4, "pitch": "F4" },
+				{ "type": "note", "duration": 4, "pitch": "G4" },
+				{ "type": "note", "duration": 4, "pitch": "A4" },
+				{ "type": "note", "duration": 4, "pitch": "B4" },
+				{ "type": "note", "duration": 4, "pitch": "C5" },
+				{ "type": "note", "duration": 4, "pitch": "C4" }
 			]
 		}
 	]

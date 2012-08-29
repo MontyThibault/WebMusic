@@ -18,6 +18,16 @@ function Keyboard(white, black) {
 	// For event callbacks
 	var keys = this;
 
+
+	var mouseDown = false;
+	$(window).on('mousedown', function() {
+		mouseDown = true;
+	});
+
+	$(window).on('mouseup', function() {
+		mouseDown = false;
+	});
+
 	for(var octave = 2; octave < 8; octave++) {
 
 		currentOctave = new Panel();
@@ -30,28 +40,20 @@ function Keyboard(white, black) {
 			currentKey.svg.attr('pitch', wholeNames[bottom] + octave);
 			
 			currentKey.translate(keyWidth * bottom, 0);
-			currentKey.svg.on('mouseenter', function() {
+			currentKey.svg.on('mouseenter', function(e) {
+				color(this, '#bde8ff');
 
-				// The main white area of the key
-				var path = $(this).find('path').first();
-				var style = path.attr('style');
-				style = style.replace(/fill:[^;]+/g, 'fill:#bde8ff;')
-				path.attr('style', style);
+				if(mouseDown) {
+					play($(this).attr('pitch'));
+				}
 
-				// $(this).attr('style', 'fill:rgb(255, 0, 0);');
 			});
 			currentKey.svg.on('mouseleave', function() {
-				var path = $(this).find('path').first();
-				var style = path.attr('style');
-				style = style.replace(/fill:[^;]+/g, 'fill:#ffffff;')
-				path.attr('style', style);
+				color(this, '#ffffff');
 			});
-			currentKey.svg.on('click', function() {
-				var pitch = new Pitch($(this).attr('pitch'));
-				var note = new Note(pitch, 1000, [
-					Clip()
-				]);
-				keys.instrument.play(note);
+
+			currentKey.svg.on('mousedown', function() {
+				play($(this).attr('pitch'));
 			});
 
 			currentOctave.svg.append(currentKey.svg);
@@ -69,32 +71,38 @@ function Keyboard(white, black) {
 			currentKey.translate(keyWidth * (top + 0.6), 0);
 			currentKey.svg.on('mouseenter', function() {
 
-				// The main white area of the key
-				var path = $(this).find('path').first();
-				var style = path.attr('style');
-				style = style.replace(/fill:[^;]+/g, 'fill:#bde8ff;')
-				path.attr('style', style);
+				color(this, '#bde8ff');
 
-				// $(this).attr('style', 'fill:rgb(255, 0, 0);');
+				if(mouseDown) {
+					play($(this).attr('pitch'));
+				}
 			});
 			currentKey.svg.on('mouseleave', function() {
-				var path = $(this).find('path').first();
-				var style = path.attr('style');
-				style = style.replace(/fill:[^;]+/g, 'fill:#171717;')
-				path.attr('style', style);
+				color(this, '#171717');
 			});
-			currentKey.svg.on('click', function() {
-				var pitch = new Pitch($(this).attr('pitch'));
-				var note = new Note(pitch, 1000, [
-					Clip()
-				]);
-				keys.instrument.play(note);
+			currentKey.svg.on('mousedown', function() {
+				play($(this).attr('pitch'));
 			});
 
 			currentOctave.svg.append(currentKey.svg);
 		}
 
 		this.svg.append(currentOctave.svg);
+	}
+
+	function play(pitch) {
+		var pitch = new Pitch(pitch);
+		var note = new Note(pitch, 1000, [
+			Clip()
+		]);
+		keys.instrument.play(note);
+	}
+
+	function color(element, color) {
+		var path = $(element).find('path').first();
+		var style = path.attr('style');
+		style = style.replace(/fill:[^;]+/g, 'fill:'+color+';')
+		path.attr('style', style);
 	}
 }
 

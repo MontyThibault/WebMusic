@@ -161,8 +161,8 @@ Pitch.prototype.setName = function(pitch) {
 
 function Note(pitch, duration, modifiers) {
 	this.pitch = pitch;
-	this.modifiers = modifiers;
 	this.duration = duration;
+	this.modifiers = modifiers;
 	
 	// Set when the note starts playing
 	this.start = null;
@@ -221,9 +221,94 @@ Instrument.prototype.play = function(note) {
 
 
 ///////////////////////////////////////
+//File: src/core/player.js
+
+
+function Player(initial, instrument, events) {
+	this.state = initial;
+	this.instrument = instrument;
+	this.events = events;
+
+	this.active = true;
+}
+
+Player.prototype.process = function(evt) {
+	if(!this.active)
+		return false;
+
+	evt = evt || this.events.shift();
+
+	// Done the sequence
+	if(!evt)
+		return false;
+
+	var wait = this.callbacks[evt.type] && this.callbacks[evt.type].call(this, evt);
+
+	if(wait < 5) {
+		this.process();
+	} else {
+		var player = this;
+		setTimeout(function() {
+			player.process();
+		}, wait);
+	}
+};
+
+// These methods corrispond to the JSON event types
+// They return the millisecond delay until the next process
+Player.prototype.callbacks = {
+	tempo: function(evt) {
+		this.state.tempo = evt.tempo;
+
+		return 0;
+	},
+	timesig: function(evt) {
+		this.state.timesig = evt.timesig;
+
+		return 0;
+	},
+	note: function(evt) {
+
+		var pitch = new Pitch(evt.pitch),
+			beats = evt.duration / 4,
+			minute = 1000 * 60,
+			duration = minute / this.state.tempo / beats;
+
+		var modifiers = [];
+
+		evt.staccato && modifiers.push(Staccato());
+		evt.dynamic && modifiers.push(Dynamic(evt.dynamic));
+		!evt.letRing && modifiers.push(Clip());
+
+		var note = new Note(
+			new Pitch(evt.pitch),
+			duration,
+			modifiers
+		);
+		this.instrument.play(note);
+
+		var off = this.state.keyboard.highlight(evt.pitch);
+		setTimeout(function() {
+			off();
+		}, duration);
+
+		return duration;
+	},
+	rest: function(evt) {
+		var beats = evt.duration / 4,
+			minute = 1000 * 60,
+			duration = minute / this.state.tempo / beats;
+
+		return duration;
+	}
+}
+
+
+///////////////////////////////////////
 //File: src/display/svg.js
 
 
+// The master svg object to hold elements
 var svg = $('svg')[0];
 
 
@@ -471,6 +556,16 @@ function Keyboard(white, black) {
 	// For event callbacks
 	var keys = this;
 
+
+	var mouseDown = false;
+	$(window).on('mousedown', function() {
+		mouseDown = true;
+	});
+
+	$(window).on('mouseup', function() {
+		mouseDown = false;
+	});
+
 	for(var octave = 2; octave < 8; octave++) {
 
 		currentOctave = new Panel();
@@ -483,28 +578,20 @@ function Keyboard(white, black) {
 			currentKey.svg.attr('pitch', wholeNames[bottom] + octave);
 			
 			currentKey.translate(keyWidth * bottom, 0);
-			currentKey.svg.on('mouseenter', function() {
+			currentKey.svg.on('mouseenter', function(e) {
+				color(this, '#bde8ff');
 
-				// The main white area of the key
-				var path = $(this).find('path').first();
-				var style = path.attr('style');
-				style = style.replace(/fill:[^;]+/g, 'fill:#bde8ff;')
-				path.attr('style', style);
+				if(mouseDown) {
+					play($(this).attr('pitch'));
+				}
 
-				// $(this).attr('style', 'fill:rgb(255, 0, 0);');
 			});
 			currentKey.svg.on('mouseleave', function() {
-				var path = $(this).find('path').first();
-				var style = path.attr('style');
-				style = style.replace(/fill:[^;]+/g, 'fill:#ffffff;')
-				path.attr('style', style);
+				color(this, '#ffffff');
 			});
-			currentKey.svg.on('click', function() {
-				var pitch = new Pitch($(this).attr('pitch'));
-				var note = new Note(pitch, 1000, [
-					Clip()
-				]);
-				keys.instrument.play(note);
+
+			currentKey.svg.on('mousedown', function() {
+				play($(this).attr('pitch'));
 			});
 
 			currentOctave.svg.append(currentKey.svg);
@@ -522,32 +609,38 @@ function Keyboard(white, black) {
 			currentKey.translate(keyWidth * (top + 0.6), 0);
 			currentKey.svg.on('mouseenter', function() {
 
-				// The main white area of the key
-				var path = $(this).find('path').first();
-				var style = path.attr('style');
-				style = style.replace(/fill:[^;]+/g, 'fill:#bde8ff;')
-				path.attr('style', style);
+				color(this, '#bde8ff');
 
-				// $(this).attr('style', 'fill:rgb(255, 0, 0);');
+				if(mouseDown) {
+					play($(this).attr('pitch'));
+				}
 			});
 			currentKey.svg.on('mouseleave', function() {
-				var path = $(this).find('path').first();
-				var style = path.attr('style');
-				style = style.replace(/fill:[^;]+/g, 'fill:#171717;')
-				path.attr('style', style);
+				color(this, '#171717');
 			});
-			currentKey.svg.on('click', function() {
-				var pitch = new Pitch($(this).attr('pitch'));
-				var note = new Note(pitch, 1000, [
-					Clip()
-				]);
-				keys.instrument.play(note);
+			currentKey.svg.on('mousedown', function() {
+				play($(this).attr('pitch'));
 			});
 
 			currentOctave.svg.append(currentKey.svg);
 		}
 
 		this.svg.append(currentOctave.svg);
+	}
+
+	function play(pitch) {
+		var pitch = new Pitch(pitch);
+		var note = new Note(pitch, 1000, [
+			Clip()
+		]);
+		keys.instrument.play(note);
+	}
+
+	function color(element, color) {
+		var path = $(element).find('path').first();
+		var style = path.attr('style');
+		style = style.replace(/fill:[^;]+/g, 'fill:'+color+';')
+		path.attr('style', style);
 	}
 }
 
@@ -590,15 +683,6 @@ function breakEverything() {
 //File: src/main.js
 
 
-var tick = false;
-window.log = function() {
-	if(!tick) {
-		console.log.apply(console, arguments);
-		tick = true;
-		setTimeout(function() { tick = true; }, 1000);
-	}
-};
-
 window.onload = function() {
 	var items = [
 		[load.all, [
@@ -616,7 +700,8 @@ window.onload = function() {
 	];
 
 	load.all(items, function(loaded) {
-		$('h2').remove();
+		// Remove spinner
+		spin.remove();
 
 		var samples = loaded[0],
 			images = loaded[1],
@@ -652,6 +737,32 @@ window.onload = function() {
 		stretch();
 		window.onresize = stretch;
 
-		window.keyboard = keys;
+		////////////////////////////////////
+
+		var channel;
+		for(var i = 0; i < music.channels.length; i++) {
+			channel = music.channels[i];
+
+			var player = new Player({
+				tempo: 120,
+				timesig: [4, 4],
+				keyboard: keys
+			}, piano, channel.events, {});
+			
+			player.process();
+		}
 	});
+
+	// Loading spinner
+	var options = {
+		top: window.innerHeight / 3,
+		left: window.innerWidth / 2,
+		lines: 13,
+		length: 8,
+		width: 4,
+		radius: 24
+	};
+	var target = $('body')[0];
+	var spin = $(new Spinner(options).spin(target).el);
+	spin.css('position', 'absolute');
 };

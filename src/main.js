@@ -1,12 +1,3 @@
-var tick = false;
-window.log = function() {
-	if(!tick) {
-		console.log.apply(console, arguments);
-		tick = true;
-		setTimeout(function() { tick = true; }, 1000);
-	}
-};
-
 window.onload = function() {
 	var items = [
 		[load.all, [
@@ -24,7 +15,8 @@ window.onload = function() {
 	];
 
 	load.all(items, function(loaded) {
-		$('h2').remove();
+		// Remove spinner
+		spin.remove();
 
 		var samples = loaded[0],
 			images = loaded[1],
@@ -60,6 +52,32 @@ window.onload = function() {
 		stretch();
 		window.onresize = stretch;
 
-		window.keyboard = keys;
+		////////////////////////////////////
+
+		var channel;
+		for(var i = 0; i < music.channels.length; i++) {
+			channel = music.channels[i];
+
+			var player = new Player({
+				tempo: 120,
+				timesig: [4, 4],
+				keyboard: keys
+			}, piano, channel.events, {});
+			
+			player.process();
+		}
 	});
+
+	// Loading spinner
+	var options = {
+		top: window.innerHeight / 3,
+		left: window.innerWidth / 2,
+		lines: 13,
+		length: 8,
+		width: 4,
+		radius: 24
+	};
+	var target = $('body')[0];
+	var spin = $(new Spinner(options).spin(target).el);
+	spin.css('position', 'absolute');
 };
