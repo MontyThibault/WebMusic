@@ -24,6 +24,8 @@ window.onload = function() {
 	];
 
 	load.all(items, function(loaded) {
+		$('h2').remove();
+
 		var samples = loaded[0],
 			images = loaded[1],
 			music = loaded[2];
@@ -42,100 +44,22 @@ window.onload = function() {
 
 		///////////////////////////////////////
 
-		var white = images[0],
-			black = images[1];
+		var keys = new Keyboard(images[0], images[1]);
+		keys.instrument = piano;
 
-		// Center along x axes
-		white.translate(-white.box().width / 2, 0);
-		black.translate(-black.box().width / 2, 0);
+		$(svg).append(keys.svg);
 
-		var keyboard = new Panel(),
-			keyWidth = white.box().width * 1.05;
+		function stretch() {
+			// Stretch to fill window
+			var box = keys.box(),
+				scale = window.innerWidth / box.width;
 
-		var currentKey = null,
-			currentOctave = null;
-
-		for(var octave = 0; octave < 4; octave++) {
-
-			currentOctave = new Panel();
-			currentOctave.translate(octave * (keyWidth * 7), 0);
-
-			// Bottom row of keys
-			for(var bottom = 0; bottom < 7; bottom++) {
-
-				currentKey = white.clone();
-				
-				currentKey.translate(keyWidth * bottom, 0);
-				currentKey.svg.on('mouseenter', function() {
-
-					// The main white area of the key
-					var path = $(this).find('path').first();
-					var style = path.attr('style');
-					style = style.replace(/fill:[^;]+/g, 'fill:#bde8ff;')
-					path.attr('style', style);
-
-					// $(this).attr('style', 'fill:rgb(255, 0, 0);');
-				});
-				currentKey.svg.on('mouseleave', function() {
-					var path = $(this).find('path').first();
-					var style = path.attr('style');
-					style = style.replace(/fill:[^;]+/g, 'fill:#ffffff;')
-					path.attr('style', style);
-				});
-
-
-				currentOctave.svg.append(currentKey.svg);
-
-			}
-
-			// Top row of keys
-			for(var top = 0; top < 7; top++) {
-				if(top === 2 || top === 6) {
-					continue;
-				}
-
-				currentKey = black.clone();
-
-				currentKey.translate(keyWidth * (top + 0.6), 0);
-				currentKey.svg.on('mouseenter', function() {
-
-					// The main white area of the key
-					var path = $(this).find('path').first();
-					var style = path.attr('style');
-					style = style.replace(/fill:[^;]+/g, 'fill:#bde8ff;')
-					path.attr('style', style);
-
-					// $(this).attr('style', 'fill:rgb(255, 0, 0);');
-				});
-				currentKey.svg.on('mouseleave', function() {
-					var path = $(this).find('path').first();
-					var style = path.attr('style');
-					style = style.replace(/fill:[^;]+/g, 'fill:#171717;')
-					path.attr('style', style);
-				});
-
-				currentOctave.svg.append(currentKey.svg);
-
-			}
-
-			keyboard.svg.append(currentOctave.svg);
+			keys.translate(0, window.innerHeight - (box.height * scale) - 10);
+			keys.scale(scale);
 		}
+		stretch();
+		window.onresize = stretch;
 
-		keyboard.scale(5, 5);
-
-		$(svg).append(keyboard.svg);
-
-		window.keyboard = keyboard;
-
-		// white = arguments[3];
-		//$(svg).append(white.svg[0]);
-
-		// var pitch = new Pitch('C5'),
-		// 	note = new Note(pitch, 1000, [
-		// 		Dynamic('mp'),
-		// 		Staccato()
-		// 	]);
-
-		// piano.play(note);
+		window.keyboard = keys;
 	});
 };

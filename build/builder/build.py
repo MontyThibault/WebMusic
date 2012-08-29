@@ -21,6 +21,8 @@ files = [
 	# 'display/vector2.js',
 	'modifiers/dynamic.js',
 	'modifiers/staccato.js',
+	'modifiers/clip.js',
+	'display/keyboard.js',
 	'tests.js',
 	'main.js'
 ]

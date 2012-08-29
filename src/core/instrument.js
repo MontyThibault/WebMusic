@@ -1,9 +1,8 @@
-var HALFSTEP_INTERVAL = Math.pow(2, 1 / 12);
-
 function Instrument(samples) {
 	this.samples = samples;
 }
 
+var HALFSTEP_INTERVAL = Math.pow(2, 1 / 12);
 Instrument.prototype.play = function(note) {
 	// Get sample closest to target pitch
 	var closestSample,
@@ -20,24 +19,27 @@ Instrument.prototype.play = function(note) {
 
 	note.start = new Date().getTime();
 
-	// Standard Web Audio API lingo
 	var source = context.createBufferSource();
 	source.buffer = closestSample;
 
 	// Connect all of the modifiers in a chain
-	var currentNode = source;
+	var currentModifier = source;
 	for(var i = 0; i < note.modifiers.length; i++) {
 
 		note.modifiers[i].note = note;
 
-		currentNode.connect(note.modifiers[i]);
-		currentNode = note.modifiers[i];
-	}
-	currentNode.connect(context.destination);
+		currentModifier.connect(note.modifiers[i]);
+		currentModifier = note.modifiers[i];
 
-	var diff = note.pitch - closestSample.pitch;
-	source.playbackRate.value = Math.pow(HALFSTEP_INTERVAL, diff)
+		currentModifier.start && currentModifier.start(note);
+	}
+	currentModifier.connect(context.destination);
+
+	var diff = note.pitch.step - closestSample.pitch.step;
+	source.playbackRate.value = Math.pow(HALFSTEP_INTERVAL, diff);
 
 	// Play the note
 	source.noteOn(0);
+
+	return source.noteOff;
 };

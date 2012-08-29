@@ -15,7 +15,7 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.48.2 r9819"
-   sodipodi:docname="keyboard.svg">
+   sodipodi:docname="whiteKey.svg">
   <defs
      id="defs4">
     <linearGradient
@@ -166,9 +166,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="7.9195959"
-     inkscape:cx="29.490969"
-     inkscape:cy="25.495282"
+     inkscape:zoom="16"
+     inkscape:cx="11.857923"
+     inkscape:cy="66.063052"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -189,7 +189,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -199,15 +199,13 @@
      id="layer1"
      transform="translate(-96.647484,-146.5843)">
     <g
-       id="g3913"
-       note="C"
-       onclick="click()">
+       id="g3913">
       <path
-         note="E"
          inkscape:connector-curvature="0"
          id="E0"
-         d="m 108.96862,146.82646 c 0,0 0,67.67857 0,69.46429 0,1.78571 -0.67865,2.58928 -2.46011,2.58928 -1.78148,0 -5.8534,0 -7.7197,0 -1.866299,0 -1.89917,-1.65647 -1.89917,-3.46216 0,-1.80569 0,-68.41284 0,-68.41284 z"
-         style="fill:#ffffff;fill-opacity:1;stroke:url(#linearGradient3859);stroke-width:0.48431227;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+         d="m 108.96862,146.82646 c 0,0 0,67.67857 0,69.46429 0,1.78571 -0.67865,2.58928 -2.46011,2.58928 -1.78148,0 -5.8534,0 -7.7197,0 -1.866299,0 -1.89917,-1.65647 -1.89917,-3.46216 0,-1.80569 0,-68.59253 0,-68.59253 z"
+         style="fill:#ffffff;fill-opacity:1;stroke:url(#linearGradient3859);stroke-width:0.48431227;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+         sodipodi:nodetypes="csssscc" />
       <path
          sodipodi:nodetypes="ccssssc"
          inkscape:connector-curvature="0"
