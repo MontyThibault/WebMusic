@@ -248,11 +248,13 @@ Player.prototype.process = function(evt) {
 
 	evt = evt || this.events.shift();
 
+	console.log(evt);
+
 	// Done the sequence
 	if(!evt)
 		return false;
 
-	var wait = this.callbacks[evt.type] && this.callbacks[evt.type].call(this, evt);
+	var wait = this.callbacks[evt.type].call(this, evt) || 0;
 
 	if(wait < 5) {
 		this.process();
@@ -267,15 +269,20 @@ Player.prototype.process = function(evt) {
 // These methods corrispond to the JSON event types
 // They return the millisecond delay until the next process
 Player.prototype.callbacks = {
+	letRing: function(evt) {
+		this.state.letRing = evt.value;
+	},
+	dynamic: function(evt) {
+		this.state.dynamic = evt.value;
+	},
+	staccato: function(evt) {
+		this.state.staccato = evt.value;
+	},
 	tempo: function(evt) {
 		this.state.tempo = evt.tempo;
-
-		return 0;
 	},
 	timesig: function(evt) {
 		this.state.timesig = evt.timesig;
-
-		return 0;
 	},
 	note: function(evt) {
 
@@ -286,9 +293,9 @@ Player.prototype.callbacks = {
 
 		var modifiers = [];
 
-		evt.staccato && modifiers.push(Staccato());
-		evt.dynamic && modifiers.push(Dynamic(evt.dynamic));
-		!evt.letRing && modifiers.push(Clip());
+		(evt.staccato || this.state.staccato) && modifiers.push(Staccato());
+		(evt.dynamic || this.state.dynamic) && modifiers.push(Dynamic(evt.dynamic));
+		!(evt.letRing || this.state.letRing) && modifiers.push(Clip());
 
 		var note = new Note(
 			new Pitch(evt.pitch),
