@@ -3,40 +3,42 @@
 	<head>
 		<title>Music App</title>
 		<style>
-			.duration {
-				display: inline-block;
-				width: 30px;
-				text-align: center;
-				color: red;
-			}
-
-			.note {
-				display: inline-block;
-				width: 30px;
-				text-align: center;
-				color: blue;
-			}
-
-			#notes > div {
-				background: #EEEEEE;
-				border: 1px solid #DDDDDD;
-				padding: 3px;
-				margin: 3px;
-				float: left;
+			html, body {
+				margin: 0px;
+				padding: 0px;
 			}
 
 			svg {
 				position: absolute;
 				top: 0px;
 				left: 0px;
+				z-index: -10;
+			}
+
+			p {
+				margin: 0px;
+				padding: 5px;
+				background: #222222;
+				color: #BBBBBB;
+				text-align: center;
+				border-bottom: 2px solid #555555;
+			}
+
+			p > a {
+				color: #91ff97;
+				text-decoration: none;
+				text-shadow: 0px 1px 1px #406e43;
+			}
+			p > a:hover {
+				color: #d8ffda;
+				-webkit-transition: color 0.5s;
 			}
 		</style>
+
+		<link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:200,400,700' rel='stylesheet' type='text/css'>
 	</head>
 	<body>	
 		<p>The music on this page is being generated dynamically with JavaScript! A modern version of Chrome or Safari is required. See <a href='https://github.com/MontyThibault/WebMusic'>this page</a> for details.</p>
-		<div id='notes'>
-
-		</div>
 		<svg>
 		</svg>
 

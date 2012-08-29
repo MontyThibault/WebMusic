@@ -2,8 +2,11 @@ function Instrument(samples) {
 	this.samples = samples;
 }
 
+// Multiply any frequency by this number to raise the note by a half step
 var HALFSTEP_INTERVAL = Math.pow(2, 1 / 12);
+
 Instrument.prototype.play = function(note) {
+
 	// Get sample closest to target pitch
 	var closestSample,
 		closestDiff;
@@ -17,6 +20,8 @@ Instrument.prototype.play = function(note) {
 		}
 	}
 
+	// This is used by modifiers to check how long a note has been playing so
+	// that falloff can be applied accurately. 
 	note.start = new Date().getTime();
 
 	var source = context.createBufferSource();
@@ -31,6 +36,7 @@ Instrument.prototype.play = function(note) {
 		currentModifier.connect(note.modifiers[i]);
 		currentModifier = note.modifiers[i];
 
+		// Some modifiers define a constructor function
 		currentModifier.start && currentModifier.start(note);
 	}
 	currentModifier.connect(context.destination);
@@ -38,7 +44,6 @@ Instrument.prototype.play = function(note) {
 	var diff = note.pitch.step - closestSample.pitch.step;
 	source.playbackRate.value = Math.pow(HALFSTEP_INTERVAL, diff);
 
-	// Play the note
 	source.noteOn(0);
 
 	return source.noteOff;

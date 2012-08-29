@@ -1,7 +1,7 @@
 {
 	"meta": {
 		"title": "The best song ever",
-		"composer": "Bach"
+		"composer": "Ronald Robert Rodriguez"
 	},
 
 	"channels": [
@@ -20,7 +20,27 @@
 				{ "type": "note", "duration": 4, "pitch": "A4" },
 				{ "type": "note", "duration": 4, "pitch": "B4" },
 				{ "type": "note", "duration": 4, "pitch": "C5" },
-				{ "type": "note", "duration": 4, "pitch": "C4" }
+
+				{ "type": "note", "duration": 16, "pitch": "C4" },
+				{ "type": "note", "duration": 16, "pitch": "E4" },
+				{ "type": "note", "duration": 16, "pitch": "G4" },
+				{ "type": "note", "duration": 16, "pitch": "C5" },
+				{ "type": "note", "duration": 16, "pitch": "E5" },
+				{ "type": "note", "duration": 16, "pitch": "G5" },
+				{ "type": "note", "duration": 16, "pitch": "C6" },
+				{ "type": "note", "duration": 16, "pitch": "E6" },
+				{ "type": "note", "duration": 16, "pitch": "G6" },
+				{ "type": "note", "duration": 16, "pitch": "C7" },
+				{ "type": "note", "duration": 16, "pitch": "E7" },
+				{ "type": "note", "duration": 16, "pitch": "G7" },
+
+				{ "type": "note", "duration": 16, "pitch": "C4" },
+				{ "type": "note", "duration": 16, "pitch": "G3" },
+				{ "type": "note", "duration": 16, "pitch": "E3" },
+				{ "type": "note", "duration": 1, "pitch": "C3", "letring": true },
+
+				{ "type": "tempo", "tempo": 150 }
+
 			]
 		}
 	]

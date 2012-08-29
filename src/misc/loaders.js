@@ -1,3 +1,6 @@
+// Interface for all loaders should be (url, callback) in order for the load.all
+// function to work properly
+
 var load = {};
 
 load.XML = function(url, callback) {
@@ -14,18 +17,16 @@ load.XML = function(url, callback) {
 };
 
 load.SVG = function(url, callback) {
-	// This will match the ending filename PLUS the proceeding period
-	var filename = url.match(/([^\/]+)\./g)[0];
-
-	// Trim off the period
-	filename = filename.substring(0, filename.length - 1);
+	// This will match the ending filename of any given directory
+	var filename = /([^\/]+)\./g.exec(url)[1];
 
 	load.XML(url, function(x) {
 
+		// Create a panel object for convenience
 		var contents = $(x).contents();
 		var panel = new Panel(contents);
 
-		panel.svg.attr('id', filename);
+		panel.svg.attr('class', filename);
 
 		return callback(panel);
 	});
@@ -46,6 +47,10 @@ load.sample = function(url, callback) {
 
 load.JSON = $.getJSON;
 
+// Loads all items in the given array. Array structure is like this:
+// [[function, url], [function, url]]
+// The script loads each item sequentially, stopping once all of the items have
+// been loaded. 
 load.all = function(items, callback, outputs) {
 	var next = items.shift();
 

@@ -13,6 +13,9 @@ var context = new webkitAudioContext();
 //File: src/misc/loaders.js
 
 
+// Interface for all loaders should be (url, callback) in order for the load.all
+// function to work properly
+
 var load = {};
 
 load.XML = function(url, callback) {
@@ -29,18 +32,16 @@ load.XML = function(url, callback) {
 };
 
 load.SVG = function(url, callback) {
-	// This will match the ending filename PLUS the proceeding period
-	var filename = url.match(/([^\/]+)\./g)[0];
-
-	// Trim off the period
-	filename = filename.substring(0, filename.length - 1);
+	// This will match the ending filename of any given directory
+	var filename = /([^\/]+)\./g.exec(url)[1];
 
 	load.XML(url, function(x) {
 
+		// Create a panel object for convenience
 		var contents = $(x).contents();
 		var panel = new Panel(contents);
 
-		panel.svg.attr('id', filename);
+		panel.svg.attr('class', filename);
 
 		return callback(panel);
 	});
@@ -61,6 +62,10 @@ load.sample = function(url, callback) {
 
 load.JSON = $.getJSON;
 
+// Loads all items in the given array. Array structure is like this:
+// [[function, url], [function, url]]
+// The script loads each item sequentially, stopping once all of the items have
+// been loaded. 
 load.all = function(items, callback, outputs) {
 	var next = items.shift();
 
@@ -177,8 +182,11 @@ function Instrument(samples) {
 	this.samples = samples;
 }
 
+// Multiply any frequency by this number to raise the note by a half step
 var HALFSTEP_INTERVAL = Math.pow(2, 1 / 12);
+
 Instrument.prototype.play = function(note) {
+
 	// Get sample closest to target pitch
 	var closestSample,
 		closestDiff;
@@ -192,6 +200,8 @@ Instrument.prototype.play = function(note) {
 		}
 	}
 
+	// This is used by modifiers to check how long a note has been playing so
+	// that falloff can be applied accurately. 
 	note.start = new Date().getTime();
 
 	var source = context.createBufferSource();
@@ -206,6 +216,7 @@ Instrument.prototype.play = function(note) {
 		currentModifier.connect(note.modifiers[i]);
 		currentModifier = note.modifiers[i];
 
+		// Some modifiers define a constructor function
 		currentModifier.start && currentModifier.start(note);
 	}
 	currentModifier.connect(context.destination);
@@ -213,7 +224,6 @@ Instrument.prototype.play = function(note) {
 	var diff = note.pitch.step - closestSample.pitch.step;
 	source.playbackRate.value = Math.pow(HALFSTEP_INTERVAL, diff);
 
-	// Play the note
 	source.noteOn(0);
 
 	return source.noteOff;
@@ -340,6 +350,7 @@ function globalSpace(pt, object) {
 //File: src/display/panel.js
 
 
+// SVG utility class
 function Panel(element) {
 
 	// Create an empty group if no element is passed in
@@ -362,6 +373,7 @@ Panel.prototype.clone = function() {
 	return new Panel(this.svg.clone());
 };
 
+// Returns the bounding box of this element
 Panel.prototype.box = function() {
 
 	// If this element is in the document markup
@@ -379,6 +391,7 @@ Panel.prototype.box = function() {
 	return box;
 };
 
+// Returns a point representing the center of this element
 Panel.prototype.center = function() {
 	var box = this.svg[0].getBBox(),
 		pt = svg.createSVGPoint();
@@ -388,7 +401,7 @@ Panel.prototype.center = function() {
 	return pt;
 };
 
-// // Wraps this panel in a group tag
+// Wraps this panel in a group tag; useful for doing multiple transformations
 Panel.prototype.wrap = function() {
 	var g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
 	this.svg.wrap(g);
@@ -402,8 +415,6 @@ Panel.prototype.translate = function(x, y) {
 
 	// Remove the current translation, if any
 	transform = transform.replace(/translate\(.*\)/g, '');
-
-	// Add a new translation
 	transform += ' translate('+ x +', '+ y +')';
 
 	this.svg.attr('transform', transform);
@@ -415,8 +426,6 @@ Panel.prototype.scale = function(x, y) {
 
 	// Remove the current scale, if any
 	transform = transform.replace(/scale\(.*\)/g, '');
-
-	// Add a new scale
 	transform += ' scale('+x+', '+(x || y)+')';
 
 	this.svg.attr('transform', transform);
@@ -428,8 +437,6 @@ Panel.prototype.rotate = function(r) {
 
 	// Remove the current rotation, if any
 	transform = transform.replace(/rotate\(.*\)/g, '');
-
-	// Add a new rotation
 	transform += ' rotate('+r+')';
 
 	this.svg.attr('transform', transform);
@@ -693,7 +700,11 @@ window.onload = function() {
 		
 		[load.all, [
 			[load.SVG, 'assets/svg/whiteKey.svg'],
-			[load.SVG, 'assets/svg/blackKey.svg']
+			[load.SVG, 'assets/svg/blackKey.svg'],
+
+			[load.SVG, 'assets/svg/treble.svg'],
+			[load.SVG, 'assets/svg/bass.svg'],
+			[load.SVG, 'assets/svg/lines.svg']
 		]],
 		
 		[load.JSON, 'music.json']
@@ -736,6 +747,48 @@ window.onload = function() {
 		}
 		stretch();
 		window.onresize = stretch;
+		////////////////////////////////////
+
+		var treble = images[2],
+			bass = images[3],
+			lines = images[4];
+
+		var title = new Panel(document.createElementNS('http://www.w3.org/2000/svg', 'text'));
+		title.svg.text(music.meta.title);
+
+		title.svg.css({
+			'font-family': 'Source Sans Pro',
+			'font-weight': 400
+		});
+
+		var box = title.box();
+
+		title.translate(-box.x, -box.y);
+		title.scale(3);
+
+		title.wrap();
+		title.translate(30, 100);
+
+		$(svg).append(title.svg);
+
+		var composer = new Panel(document.createElementNS('http://www.w3.org/2000/svg', 'text'));
+		composer.svg.text(music.meta.composer);
+
+		composer.svg.css({
+			'font-family': 'Source Sans Pro',
+			'font-weight': 200
+		});
+
+		var box = composer.box();
+
+		composer.translate(-box.x, -box.y);
+		composer.scale(1.5);
+
+		composer.wrap();
+		composer.translate(30, 130);
+
+		$(svg).append(composer.svg);
+
 
 		////////////////////////////////////
 

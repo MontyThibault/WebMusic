@@ -1,3 +1,4 @@
+// SVG utility class
 function Panel(element) {
 
 	// Create an empty group if no element is passed in
@@ -20,6 +21,7 @@ Panel.prototype.clone = function() {
 	return new Panel(this.svg.clone());
 };
 
+// Returns the bounding box of this element
 Panel.prototype.box = function() {
 
 	// If this element is in the document markup
@@ -37,6 +39,7 @@ Panel.prototype.box = function() {
 	return box;
 };
 
+// Returns a point representing the center of this element
 Panel.prototype.center = function() {
 	var box = this.svg[0].getBBox(),
 		pt = svg.createSVGPoint();
@@ -46,7 +49,7 @@ Panel.prototype.center = function() {
 	return pt;
 };
 
-// // Wraps this panel in a group tag
+// Wraps this panel in a group tag; useful for doing multiple transformations
 Panel.prototype.wrap = function() {
 	var g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
 	this.svg.wrap(g);
@@ -60,8 +63,6 @@ Panel.prototype.translate = function(x, y) {
 
 	// Remove the current translation, if any
 	transform = transform.replace(/translate\(.*\)/g, '');
-
-	// Add a new translation
 	transform += ' translate('+ x +', '+ y +')';
 
 	this.svg.attr('transform', transform);
@@ -73,8 +74,6 @@ Panel.prototype.scale = function(x, y) {
 
 	// Remove the current scale, if any
 	transform = transform.replace(/scale\(.*\)/g, '');
-
-	// Add a new scale
 	transform += ' scale('+x+', '+(x || y)+')';
 
 	this.svg.attr('transform', transform);
@@ -86,8 +85,6 @@ Panel.prototype.rotate = function(r) {
 
 	// Remove the current rotation, if any
 	transform = transform.replace(/rotate\(.*\)/g, '');
-
-	// Add a new rotation
 	transform += ' rotate('+r+')';
 
 	this.svg.attr('transform', transform);

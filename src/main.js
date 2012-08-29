@@ -8,7 +8,11 @@ window.onload = function() {
 		
 		[load.all, [
 			[load.SVG, 'assets/svg/whiteKey.svg'],
-			[load.SVG, 'assets/svg/blackKey.svg']
+			[load.SVG, 'assets/svg/blackKey.svg'],
+
+			[load.SVG, 'assets/svg/treble.svg'],
+			[load.SVG, 'assets/svg/bass.svg'],
+			[load.SVG, 'assets/svg/lines.svg']
 		]],
 		
 		[load.JSON, 'music.json']
@@ -51,6 +55,48 @@ window.onload = function() {
 		}
 		stretch();
 		window.onresize = stretch;
+		////////////////////////////////////
+
+		var treble = images[2],
+			bass = images[3],
+			lines = images[4];
+
+		var title = new Panel(document.createElementNS('http://www.w3.org/2000/svg', 'text'));
+		title.svg.text(music.meta.title);
+
+		title.svg.css({
+			'font-family': 'Source Sans Pro',
+			'font-weight': 400
+		});
+
+		var box = title.box();
+
+		title.translate(-box.x, -box.y);
+		title.scale(3);
+
+		title.wrap();
+		title.translate(30, 100);
+
+		$(svg).append(title.svg);
+
+		var composer = new Panel(document.createElementNS('http://www.w3.org/2000/svg', 'text'));
+		composer.svg.text(music.meta.composer);
+
+		composer.svg.css({
+			'font-family': 'Source Sans Pro',
+			'font-weight': 200
+		});
+
+		var box = composer.box();
+
+		composer.translate(-box.x, -box.y);
+		composer.scale(1.5);
+
+		composer.wrap();
+		composer.translate(30, 130);
+
+		$(svg).append(composer.svg);
+
 
 		////////////////////////////////////
 
