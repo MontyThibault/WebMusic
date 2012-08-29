@@ -1,0 +1,1 @@
+Welcome to the source of the application! All of the code is divided into individual files located in this directory. The [build script](https://github.com/MontyThibault/WebMusic/blob/gh-pages/build/builder/build.py) compiles all of the files and saves them under the file [build/max.js](https://github.com/MontyThibault/WebMusic/blob/gh-pages/build/max.js).

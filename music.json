@@ -15,11 +15,11 @@
 				{ "type": "note", "duration": 4, "pitch": "C4" },
 				{ "type": "note", "duration": 4, "pitch": "D4" },
 				{ "type": "note", "duration": 4, "pitch": "E4" },
-				{ "type": "note", "duration": 4, "pitch": "F4" },
-				{ "type": "note", "duration": 4, "pitch": "G4" },
-				{ "type": "note", "duration": 4, "pitch": "A4" },
-				{ "type": "note", "duration": 4, "pitch": "B4" },
-				{ "type": "note", "duration": 4, "pitch": "C5" },
+				{ "type": "note", "duration": 4, "pitch": "F4", "staccato": true },
+				{ "type": "note", "duration": 4, "pitch": "G4", "staccato": true },
+				{ "type": "note", "duration": 4, "pitch": "A4", "staccato": true },
+				{ "type": "note", "duration": 4, "pitch": "B4", "staccato": true },
+				{ "type": "note", "duration": 4, "pitch": "C5", "dynamic": "f", "letRing": true },
 
 				{ "type": "note", "duration": 16, "pitch": "C4" },
 				{ "type": "note", "duration": 16, "pitch": "E4" },
@@ -34,13 +34,10 @@
 				{ "type": "note", "duration": 16, "pitch": "E7" },
 				{ "type": "note", "duration": 16, "pitch": "G7" },
 
-				{ "type": "note", "duration": 16, "pitch": "C4" },
-				{ "type": "note", "duration": 16, "pitch": "G3" },
-				{ "type": "note", "duration": 16, "pitch": "E3" },
-				{ "type": "note", "duration": 1, "pitch": "C3", "letring": true },
-
-				{ "type": "tempo", "tempo": 150 }
-
+				{ "type": "note", "duration": 16, "pitch": "C4", "dynamic": "f", "letRing": true },
+				{ "type": "note", "duration": 16, "pitch": "G3", "dynamic": "f", "letRing": true },
+				{ "type": "note", "duration": 16, "pitch": "E3", "dynamic": "f", "letRing": true },
+				{ "type": "note", "duration": 1, "pitch": "C3", "dynamic": "f", "letRing": true },
 			]
 		}
 	]
