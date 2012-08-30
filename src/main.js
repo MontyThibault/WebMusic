@@ -119,7 +119,7 @@ window.onload = function() {
 	var options = {
 		lines: 13,
 		length: 8,
-		width: 4,
+		width: 2,
 		radius: 24
 	};
 	var target = $('body')[0];
