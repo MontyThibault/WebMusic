@@ -56,6 +56,7 @@ window.onload = function() {
 		}
 		stretch();
 		window.onresize = stretch;
+		
 		////////////////////////////////////
 
 		var treble = images[2],
