@@ -1,1 +1,1 @@
-var context = new webkitAudioContext();
+var context = new AudioContext();

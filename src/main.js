@@ -81,23 +81,30 @@ window.onload = function() {
 
 		$(svg).append(title.svg);
 
-		var composer = new Panel(document.createElementNS('http://www.w3.org/2000/svg', 'text'));
-		composer.svg.text(music.meta.composer);
+		var note1 = document.createElementNS('http://www.w3.org/2000/svg', 'text'),
+			note2 = document.createElementNS('http://www.w3.org/2000/svg', 'text'),
+			notes = new Panel([
+				note1, 
+				note2
+		]);
 
-		composer.svg.css({
+		$(note1).text(music.meta.note1);
+		$(note2).text(music.meta.note2).attr('transform', 'translate(0, 20)');
+
+		notes.svg.css({
 			'font-family': 'Source Sans Pro',
 			'font-weight': 200
 		});
 
-		var box = composer.box();
+		var box = notes.box();
 
-		composer.translate(-box.x, -box.y);
-		composer.scale(1.5);
+		notes.translate(-box.x, -box.y);
+		notes.scale(1.5);
 
-		composer.wrap();
-		composer.translate(30, 130);
+		notes.wrap();
+		notes.translate(30, 130);
 
-		$(svg).append(composer.svg);
+		$(svg).append(notes.svg);
 
 
 		////////////////////////////////////

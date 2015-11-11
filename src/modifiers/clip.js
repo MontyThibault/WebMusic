@@ -10,7 +10,7 @@ var Clip = (function() {
 	};
 
 	function Clip() {
-		var modifier = context.createGainNode();
+		var modifier = context.createGain();
 		modifier.start = timer;
 
 		return modifier;

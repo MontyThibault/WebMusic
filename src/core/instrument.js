@@ -44,7 +44,7 @@ Instrument.prototype.play = function(note) {
 	var diff = note.pitch.step - closestSample.pitch.step;
 	source.playbackRate.value = Math.pow(HALFSTEP_INTERVAL, diff);
 
-	source.noteOn(0);
+	source.start();
 
-	return source.noteOff;
+	return source.stop;
 };

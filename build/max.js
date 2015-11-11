@@ -6,7 +6,7 @@ I love source code!
 //File: src/misc/context.js
 
 
-var context = new webkitAudioContext();
+var context = new AudioContext();
 
 
 ///////////////////////////////////////
@@ -236,9 +236,9 @@ Instrument.prototype.play = function(note) {
 	var diff = note.pitch.step - closestSample.pitch.step;
 	source.playbackRate.value = Math.pow(HALFSTEP_INTERVAL, diff);
 
-	source.noteOn(0);
+	source.start();
 
-	return source.noteOff;
+	return source.stop;
 };
 
 
@@ -479,7 +479,9 @@ var Dynamic = (function() {
 	};
 
 	function Dynamic(level) {
-		var modifier = context.createGainNode();
+		level = level || 'mf';
+
+		var modifier = context.createGain();
 		modifier.gain.value = levels[level];
 
 		return modifier;
@@ -519,7 +521,7 @@ var Staccato = (function() {
 	};
 
 	function Staccato() {
-		var modifier = context.createJavaScriptNode(1024, 1, 1);
+		var modifier = context.createScriptProcessor(1024, 1, 1);
 		modifier.onaudioprocess = process;
 
 		return modifier;
@@ -546,7 +548,7 @@ var Clip = (function() {
 	};
 
 	function Clip() {
-		var modifier = context.createGainNode();
+		var modifier = context.createGain();
 		modifier.start = timer;
 
 		return modifier;
@@ -671,7 +673,7 @@ function Keyboard(white, black) {
 Keyboard.prototype = Object.create(Panel.prototype);
 
 Keyboard.prototype.highlight = function(pitch, color) {
-	color = color || 'bde8ff';
+	color = color || '#bde8ff';
 	var fill = /fill:([^;]+)/g;
 
 	var key = this.svg.find('[pitch=' + pitch + ']');
@@ -790,23 +792,30 @@ window.onload = function() {
 
 		$(svg).append(title.svg);
 
-		var composer = new Panel(document.createElementNS('http://www.w3.org/2000/svg', 'text'));
-		composer.svg.text(music.meta.composer);
+		var note1 = document.createElementNS('http://www.w3.org/2000/svg', 'text'),
+			note2 = document.createElementNS('http://www.w3.org/2000/svg', 'text'),
+			notes = new Panel([
+				note1, 
+				note2
+		]);
 
-		composer.svg.css({
+		$(note1).text(music.meta.note1);
+		$(note2).text(music.meta.note2).attr('transform', 'translate(0, 20)');
+
+		notes.svg.css({
 			'font-family': 'Source Sans Pro',
 			'font-weight': 200
 		});
 
-		var box = composer.box();
+		var box = notes.box();
 
-		composer.translate(-box.x, -box.y);
-		composer.scale(1.5);
+		notes.translate(-box.x, -box.y);
+		notes.scale(1.5);
 
-		composer.wrap();
-		composer.translate(30, 130);
+		notes.wrap();
+		notes.translate(30, 130);
 
-		$(svg).append(composer.svg);
+		$(svg).append(notes.svg);
 
 
 		////////////////////////////////////

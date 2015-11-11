@@ -1,0 +1,3 @@
+{
+	"cmd": ["python", "${project_path:${folder}}\\build\\builder\\build.py"]
+}

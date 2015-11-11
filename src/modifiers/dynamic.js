@@ -13,7 +13,9 @@ var Dynamic = (function() {
 	};
 
 	function Dynamic(level) {
-		var modifier = context.createGainNode();
+		level = level || 'mf';
+
+		var modifier = context.createGain();
 		modifier.gain.value = levels[level];
 
 		return modifier;

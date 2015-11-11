@@ -109,7 +109,7 @@ function Keyboard(white, black) {
 Keyboard.prototype = Object.create(Panel.prototype);
 
 Keyboard.prototype.highlight = function(pitch, color) {
-	color = color || 'bde8ff';
+	color = color || '#bde8ff';
 	var fill = /fill:([^;]+)/g;
 
 	var key = this.svg.find('[pitch=' + pitch + ']');

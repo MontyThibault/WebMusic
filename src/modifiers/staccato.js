@@ -24,7 +24,7 @@ var Staccato = (function() {
 	};
 
 	function Staccato() {
-		var modifier = context.createJavaScriptNode(1024, 1, 1);
+		var modifier = context.createScriptProcessor(1024, 1, 1);
 		modifier.onaudioprocess = process;
 
 		return modifier;
